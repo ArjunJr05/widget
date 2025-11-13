@@ -1,9 +1,9 @@
 {
   "name": "Customer Order Tracker",
-  "description": "Search and manage customer orders from e-commerce platforms instantly during chat conversations. Reduces order lookup time from 2-5 minutes to 5 seconds.",
+  "description": "Reduces order lookup time by 80%. Search and manage customer orders instantly during chat conversations. Features real-time order status, tracking, and quick actions.",
   "version": "1.0.0",
-  "icon": "https://raw.githubusercontent.com/YOUR-USERNAME/salesiq-widget/main/icon.png",
-  "publisher": "Your Name Here",
+  "icon": "https://YOUR-USERNAME.github.io/salesiq-order-widget/icon.png",
+  "publisher": "Your Name",
   "category": "productivity",
   "widget_type": "panel",
   "permissions": [
@@ -12,19 +12,25 @@
   ],
   "settings": [
     {
+      "name": "demo_mode",
+      "label": "Use Demo Mode",
+      "type": "checkbox",
+      "default": true,
+      "description": "Enable to use sample data without API configuration"
+    },
+    {
       "name": "api_endpoint",
-      "label": "API Endpoint URL",
+      "label": "API Endpoint URL (Optional)",
       "type": "text",
       "required": false,
-      "placeholder": "https://your-store.myshopify.com/admin/api/2024-01/orders.json",
-      "default": "mock"
+      "placeholder": "https://your-store.com/api/orders"
     },
     {
       "name": "api_key",
-      "label": "API Key",
+      "label": "API Key (Optional)",
       "type": "password",
       "required": false,
-      "description": "Leave empty to use demo mode with sample data"
+      "description": "Only required when demo mode is disabled"
     }
   ]
 }
