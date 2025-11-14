@@ -1,1 +1,838 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Order Tracker - Zoho SalesIQ Widget</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 0;
+            margin: 0;
+            min-height: 100vh;
+        }
+
+        #widget-container {
+            background: white;
+            border-radius: 0;
+            overflow: hidden;
+            max-width: 100%;
+            margin: 0;
+            min-height: 100vh;
+        }
+
+        /* Header */
+        .widget-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+        }
+
+        .header-content {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .icon {
+            width: 40px;
+            height: 40px;
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        .widget-header h1 {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .widget-header p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        /* Search Section */
+        .search-section {
+            padding: 20px;
+            background: #f7fafc;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .search-box {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        #customer-email {
+            flex: 1;
+            min-width: 200px;
+            padding: 12px 16px;
+            border: 2px solid #cbd5e0;
+            border-radius: 8px;
+            font-size: 14px;
+            background: white;
+        }
+
+        #customer-email:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn-primary {
+            padding: 12px 24px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            white-space: nowrap;
+        }
+
+        .btn-primary:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+        }
+
+        .btn-primary:disabled {
+            background: #cbd5e0;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Error Box */
+        .error-box {
+            margin-top: 12px;
+            padding: 12px;
+            background: #fed7d7;
+            border: 1px solid #fc8181;
+            border-radius: 8px;
+            color: #c53030;
+            font-size: 14px;
+        }
+
+        /* Loading Spinner */
+        .spinner {
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.6s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Orders Container */
+        .orders-container {
+            padding: 20px;
+            max-height: calc(100vh - 300px);
+            overflow-y: auto;
+        }
+
+        .orders-header {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            color: #2d3748;
+        }
+
+        .order-card {
+            background: white;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .order-card:hover {
+            border-color: #667eea;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
+            transform: translateY(-2px);
+        }
+
+        .order-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .order-id {
+            font-weight: 700;
+            font-size: 16px;
+            color: #2d3748;
+        }
+
+        .order-date {
+            font-size: 13px;
+            color: #718096;
+            margin-top: 4px;
+        }
+
+        .status-badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .status-delivered {
+            background: #c6f6d5;
+            color: #22543d;
+        }
+
+        .status-shipped {
+            background: #bee3f8;
+            color: #2c5282;
+        }
+
+        .status-processing {
+            background: #feebc8;
+            color: #7c2d12;
+        }
+
+        .order-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 12px;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        .order-total {
+            font-size: 18px;
+            font-weight: 700;
+            color: #48bb78;
+        }
+
+        .view-details-btn {
+            color: #667eea;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        /* Order Details */
+        .order-details {
+            padding: 20px;
+            max-height: calc(100vh - 200px);
+            overflow-y: auto;
+        }
+
+        .back-btn {
+            background: none;
+            border: none;
+            color: #667eea;
+            font-weight: 600;
+            cursor: pointer;
+            margin-bottom: 16px;
+            font-size: 14px;
+            padding: 8px 0;
+        }
+
+        .back-btn:hover {
+            text-decoration: underline;
+        }
+
+        .detail-section {
+            background: white;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            overflow: hidden;
+            margin-bottom: 16px;
+        }
+
+        .detail-header {
+            background: #f7fafc;
+            padding: 16px;
+            border-bottom: 2px solid #e2e8f0;
+            font-weight: 700;
+            font-size: 16px;
+        }
+
+        .detail-content {
+            padding: 16px;
+        }
+
+        .item-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px;
+            background: #f7fafc;
+            border-radius: 8px;
+            margin-bottom: 8px;
+        }
+
+        .tracking-box {
+            background: #ebf8ff;
+            border: 2px solid #90cdf4;
+            padding: 12px;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 12px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .tracking-number {
+            font-weight: 700;
+            color: #2c5282;
+            word-break: break-all;
+        }
+
+        .copy-btn {
+            background: #4299e1;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .copy-btn:hover {
+            background: #3182ce;
+        }
+
+        .action-buttons {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 12px;
+            padding: 16px;
+        }
+
+        .action-btn {
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 14px;
+        }
+
+        .action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        .btn-blue { background: #4299e1; }
+        .btn-green { background: #48bb78; }
+        .btn-yellow { background: #ed8936; }
+        .btn-red { background: #f56565; }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #a0aec0;
+        }
+
+        .empty-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 16px;
+            opacity: 0.3;
+            stroke: currentColor;
+            fill: none;
+            stroke-width: 2;
+        }
+
+        /* Utility Classes */
+        .hidden {
+            display: none !important;
+        }
+
+        .font-bold { font-weight: 700; }
+        .text-gray { color: #718096; }
+        .mb-2 { margin-bottom: 8px; }
+
+        /* Demo notice */
+        .demo-notice {
+            background: #fef5e7;
+            border: 2px solid #f4d03f;
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 12px;
+            font-size: 13px;
+            color: #7c6d0f;
+        }
+
+        /* Responsive */
+        @media (max-width: 600px) {
+            .search-box {
+                flex-direction: column;
+            }
+
+            #customer-email {
+                width: 100%;
+            }
+
+            .btn-primary {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .action-buttons {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="widget-container">
+        <!-- Header -->
+        <div class="widget-header">
+            <div class="header-content">
+                <svg class="icon" viewBox="0 0 24 24">
+                    <rect x="3" y="3" width="18" height="18" rx="2"/>
+                    <path d="M3 9h18M9 21V9"/>
+                </svg>
+                <div>
+                    <h1>Customer Order Tracker</h1>
+                    <p>Search orders instantly</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Search Section -->
+        <div class="search-section">
+            <div class="search-box">
+                <input 
+                    type="email" 
+                    id="customer-email" 
+                    placeholder="Enter customer email..."
+                />
+                <button id="search-btn" class="btn-primary">
+                    <span id="search-text">Search Orders</span>
+                    <span id="loading-spinner" class="spinner hidden"></span>
+                </button>
+            </div>
+            <div id="error-message" class="error-box hidden"></div>
+            <div class="demo-notice">
+                <strong>Demo Mode:</strong> Try: john@example.com or sarah@example.com
+            </div>
+        </div>
+
+        <!-- Orders List -->
+        <div id="orders-list" class="orders-container hidden">
+            <div class="orders-header" id="orders-count"></div>
+            <div id="orders-content"></div>
+        </div>
+
+        <!-- Order Details -->
+        <div id="order-details" class="order-details hidden">
+            <!-- Order details will be injected here -->
+        </div>
+
+        <!-- Empty State -->
+        <div id="empty-state" class="empty-state">
+            <svg class="empty-icon" viewBox="0 0 24 24">
+                <rect x="3" y="3" width="18" height="18" rx="2"/>
+                <path d="M3 9h18M9 21V9"/>
+            </svg>
+            <p>Enter a customer email and click "Search Orders"</p>
+            <p style="margin-top: 8px; font-size: 14px;">to view their order history</p>
+        </div>
+    </div>
+
+    <!-- Zoho SalesIQ Widget SDK -->
+    <script src="https://js.zohostatic.com/salesiq/sdk/v1/widget-sdk.js"></script>
+    
+    <script>
+        // Mock order database for demonstration
+        const mockOrderDatabase = {
+            'john@example.com': [
+                {
+                    orderId: 'ORD-2024-001',
+                    status: 'delivered',
+                    total: 249.99,
+                    date: '2025-11-10',
+                    items: [
+                        { name: 'Wireless Headphones', qty: 1, price: 149.99 },
+                        { name: 'Phone Case', qty: 2, price: 50.00 }
+                    ],
+                    tracking: 'TRK1234567890',
+                    carrier: 'FedEx',
+                    estimatedDelivery: '2025-11-15',
+                    shippingAddress: '123 Main St, New York, NY 10001'
+                },
+                {
+                    orderId: 'ORD-2024-002',
+                    status: 'shipped',
+                    total: 89.99,
+                    date: '2025-11-12',
+                    items: [
+                        { name: 'USB Cable', qty: 3, price: 29.99 },
+                        { name: 'Screen Protector', qty: 2, price: 30.00 }
+                    ],
+                    tracking: 'TRK0987654321',
+                    carrier: 'UPS',
+                    estimatedDelivery: '2025-11-16',
+                    shippingAddress: '456 Oak Ave, Los Angeles, CA 90001'
+                }
+            ],
+            'sarah@example.com': [
+                {
+                    orderId: 'ORD-2024-003',
+                    status: 'processing',
+                    total: 499.99,
+                    date: '2025-11-13',
+                    items: [
+                        { name: 'Laptop Stand', qty: 1, price: 299.99 },
+                        { name: 'Wireless Mouse', qty: 1, price: 200.00 }
+                    ],
+                    tracking: null,
+                    carrier: null,
+                    estimatedDelivery: '2025-11-18',
+                    shippingAddress: '789 Pine Rd, Chicago, IL 60601'
+                }
+            ]
+        };
+
+        // Global variables
+        let currentOrders = [];
+        let ZSIQ = window.$zoho?.salesiq;
+
+        // Initialize widget
+        document.addEventListener('DOMContentLoaded', () => {
+            initializeWidget();
+            setupEventListeners();
+        });
+
+        function initializeWidget() {
+            console.log('Widget initialized');
+            
+            // Try to get visitor email from SalesIQ (if available)
+            if (ZSIQ && ZSIQ.visitor) {
+                try {
+                    ZSIQ.visitor.info((data) => {
+                        if (data && data.email) {
+                            document.getElementById('customer-email').value = data.email;
+                        }
+                    });
+                } catch (e) {
+                    console.log('SalesIQ SDK not available, using demo mode');
+                }
+            }
+        }
+
+        function setupEventListeners() {
+            const searchBtn = document.getElementById('search-btn');
+            const customerEmailInput = document.getElementById('customer-email');
+
+            searchBtn.addEventListener('click', handleSearch);
+            
+            customerEmailInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    handleSearch();
+                }
+            });
+        }
+
+        async function handleSearch() {
+            const email = document.getElementById('customer-email').value.trim();
+            
+            if (!email) {
+                showError('Please enter a customer email');
+                return;
+            }
+
+            showLoading(true);
+            hideError();
+            hideAllSections();
+
+            try {
+                const orders = await fetchOrders(email);
+                
+                if (orders && orders.length > 0) {
+                    currentOrders = orders;
+                    displayOrders(orders);
+                } else {
+                    showError('No orders found for this email address. Try: john@example.com or sarah@example.com');
+                }
+            } catch (error) {
+                showError('Error fetching orders: ' + error.message);
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        async function fetchOrders(email) {
+            // Simulate API delay
+            await new Promise(resolve => setTimeout(resolve, 800));
+            
+            // Mock data lookup
+            return mockOrderDatabase[email.toLowerCase()] || null;
+            
+            /* REAL API IMPLEMENTATION (uncomment when ready):
+            try {
+                const response = await fetch(`YOUR_API_ENDPOINT/orders?email=${encodeURIComponent(email)}`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer YOUR_API_KEY'
+                    }
+                });
+                
+                if (!response.ok) {
+                    throw new Error('API request failed');
+                }
+                
+                const data = await response.json();
+                return data.orders || [];
+            } catch (error) {
+                throw error;
+            }
+            */
+        }
+
+        function displayOrders(orders) {
+            const container = document.getElementById('orders-content');
+            const countElement = document.getElementById('orders-count');
+            
+            countElement.textContent = `Orders Found: ${orders.length}`;
+            container.innerHTML = '';
+            
+            orders.forEach(order => {
+                const orderCard = createOrderCard(order);
+                container.appendChild(orderCard);
+            });
+            
+            document.getElementById('orders-list').classList.remove('hidden');
+        }
+
+        function createOrderCard(order) {
+            const card = document.createElement('div');
+            card.className = 'order-card';
+            card.onclick = () => showOrderDetails(order);
+            
+            card.innerHTML = `
+                <div class="order-header">
+                    <div>
+                        <div class="order-id">${order.orderId}</div>
+                        <div class="order-date">${order.date}</div>
+                    </div>
+                    <span class="status-badge status-${order.status}">${order.status}</span>
+                </div>
+                <div class="order-footer">
+                    <div class="order-total">$${order.total.toFixed(2)}</div>
+                    <div class="view-details-btn">View Details →</div>
+                </div>
+            `;
+            
+            return card;
+        }
+
+        function showOrderDetails(order) {
+            hideAllSections();
+            
+            const container = document.getElementById('order-details');
+            container.innerHTML = `
+                <button class="back-btn" onclick="backToOrders()">← Back to Orders</button>
+                
+                <div class="detail-section">
+                    <div class="detail-header">
+                        <div class="order-id">${order.orderId}</div>
+                        <div style="font-weight: normal; font-size: 14px; margin-top: 4px; color: #718096;">Placed on ${order.date}</div>
+                    </div>
+                    <div class="detail-content">
+                        <span class="status-badge status-${order.status}">${order.status.toUpperCase()}</span>
+                    </div>
+                </div>
+
+                <div class="detail-section">
+                    <div class="detail-header">Order Items</div>
+                    <div class="detail-content">
+                        ${order.items.map(item => `
+                            <div class="item-row">
+                                <div>
+                                    <div class="font-bold">${item.name}</div>
+                                    <div class="text-gray">Qty: ${item.qty}</div>
+                                </div>
+                                <div class="font-bold">$${item.price.toFixed(2)}</div>
+                            </div>
+                        `).join('')}
+                        <div style="margin-top: 16px; padding-top: 16px; border-top: 2px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center;">
+                            <span class="font-bold" style="font-size: 18px;">Total:</span>
+                            <span class="order-total" style="font-size: 24px;">$${order.total.toFixed(2)}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="detail-section">
+                    <div class="detail-header">Shipping Information</div>
+                    <div class="detail-content">
+                        <div class="mb-2">
+                            <div class="text-gray" style="font-size: 13px; margin-bottom: 4px;">Shipping Address</div>
+                            <div class="font-bold">${order.shippingAddress}</div>
+                        </div>
+                        ${order.tracking ? `
+                            <div class="tracking-box">
+                                <div style="flex: 1;">
+                                    <div class="text-gray" style="font-size: 12px; margin-bottom: 4px;">Tracking Number</div>
+                                    <div class="tracking-number">${order.tracking}</div>
+                                    <div class="text-gray" style="font-size: 12px; margin-top: 8px;">Carrier: <strong>${order.carrier}</strong></div>
+                                </div>
+                                <button class="copy-btn" onclick="copyTracking('${order.tracking}')">Copy</button>
+                            </div>
+                        ` : '<div style="background: #fef5e7; padding: 12px; border-radius: 8px; color: #d68910; margin-top: 12px; border: 2px solid #f4d03f;">📦 Tracking not available yet - Order is being processed</div>'}
+                        <div style="margin-top: 12px;">
+                            <div class="text-gray" style="font-size: 13px; margin-bottom: 4px;">Estimated Delivery</div>
+                            <div class="font-bold">${order.estimatedDelivery}</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="detail-section">
+                    <div class="detail-header">Quick Actions</div>
+                    <div class="action-buttons">
+                        <button class="action-btn btn-blue" onclick="sendTrackingLink('${order.tracking || 'N/A'}', '${order.orderId}')">📧 Send Tracking</button>
+                        <button class="action-btn btn-green" onclick="updateStatus('${order.orderId}')">✏️ Update Status</button>
+                        <button class="action-btn btn-yellow" onclick="requestReturn('${order.orderId}')">↩️ Request Return</button>
+                        <button class="action-btn btn-red" onclick="processRefund('${order.orderId}')">💰 Process Refund</button>
+                    </div>
+                </div>
+            `;
+            
+            container.classList.remove('hidden');
+        }
+
+        // Action Functions
+        function copyTracking(tracking) {
+            if (tracking && tracking !== 'N/A') {
+                navigator.clipboard.writeText(tracking).then(() => {
+                    alert('✅ Tracking number copied to clipboard!');
+                }).catch(() => {
+                    alert('Tracking: ' + tracking);
+                });
+            } else {
+                alert('⚠️ Tracking number not available yet');
+            }
+        }
+
+        function sendTrackingLink(tracking, orderId) {
+            if (tracking && tracking !== 'N/A') {
+                const message = `Your tracking number for order ${orderId} is: ${tracking}`;
+                
+                // Try to send via SalesIQ if available
+                if (ZSIQ && ZSIQ.chat && ZSIQ.chat.send) {
+                    try {
+                        ZSIQ.chat.send(message);
+                        alert('✅ Tracking link sent to customer via chat');
+                    } catch (e) {
+                        alert('✅ Demo: Would send tracking link to customer:\n\n' + message);
+                    }
+                } else {
+                    alert('✅ Demo: Would send tracking link to customer:\n\n' + message);
+                }
+            } else {
+                alert('⚠️ Tracking number not available yet');
+            }
+        }
+
+        function updateStatus(orderId) {
+            const newStatus = prompt('Enter new status (processing/shipped/delivered):', 'shipped');
+            if (newStatus) {
+                alert(`✅ Status updated for ${orderId} to: ${newStatus}`);
+            }
+        }
+
+        function requestReturn(orderId) {
+            if (confirm(`Create return request for order ${orderId}?`)) {
+                alert(`✅ Return request created for ${orderId}\n\nReturn authorization number: RET-${Date.now()}`);
+            }
+        }
+
+        function processRefund(orderId) {
+            const amount = prompt('Enter refund amount:', '0.00');
+            if (amount && parseFloat(amount) > 0) {
+                if (confirm(`Process refund of $${amount} for order ${orderId}?`)) {
+                    alert(`✅ Refund of $${amount} processed for ${orderId}\n\nRefund ID: REF-${Date.now()}`);
+                }
+            }
+        }
+
+        // Helper Functions
+        function showLoading(show) {
+            const btn = document.getElementById('search-btn');
+            const spinner = document.getElementById('loading-spinner');
+            const text = document.getElementById('search-text');
+            
+            btn.disabled = show;
+            spinner.classList.toggle('hidden', !show);
+            text.textContent = show ? 'Searching...' : 'Search Orders';
+        }
+
+        function showError(message) {
+            const errorBox = document.getElementById('error-message');
+            errorBox.textContent = message;
+            errorBox.classList.remove('hidden');
+        }
+
+        function hideError() {
+            document.getElementById('error-message').classList.add('hidden');
+        }
+
+        function hideAllSections() {
+            document.getElementById('orders-list').classList.add('hidden');
+            document.getElementById('order-details').classList.add('hidden');
+            document.getElementById('empty-state').classList.add('hidden');
+        }
+
+        function backToOrders() {
+            document.getElementById('order-details').classList.add('hidden');
+            document.getElementById('orders-list').classList.remove('hidden');
+        }
+
+        // Webhook endpoint handler (for SalesIQ integration)
+        function handleWebhookRequest(data) {
+            // This function will be called when SalesIQ sends data
+            console.log('Webhook data received:', data);
+            
+            if (data.visitor && data.visitor.email) {
+                document.getElementById('customer-email').value = data.visitor.email;
+                handleSearch();
+            }
+            
+            // Return success response
+            return {
+                status: 'success',
+                message: 'Widget loaded successfully'
+            };
+        }
+
+        // Export for webhook endpoint
+        if (typeof module !== 'undefined' && module.exports) {
+            module.exports = { handleWebhookRequest };
+        }
+    </script>
+</body>
+</html>
