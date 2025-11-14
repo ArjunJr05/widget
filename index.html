@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Customer Order Tracker</title>
+    <title>Simple Widget</title>
     <style>
         * {
             margin: 0;
@@ -12,720 +12,167 @@
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: #f7fafc;
-            padding: 0;
-            margin: 0;
-            min-height: 100vh;
-        }
-
-        #widget-container {
-            background: white;
-            max-width: 100%;
-            margin: 0;
-            min-height: 100vh;
-        }
-
-        .widget-header {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 16px;
-        }
-
-        .header-content {
+            padding: 20px;
+            min-height: 100vh;
             display: flex;
             align-items: center;
-            gap: 12px;
+            justify-content: center;
         }
 
-        .icon {
-            width: 32px;
-            height: 32px;
-            fill: none;
-            stroke: currentColor;
-            stroke-width: 2;
-        }
-
-        .widget-header h1 {
-            font-size: 18px;
-            font-weight: 700;
-            margin-bottom: 2px;
-        }
-
-        .widget-header p {
-            font-size: 13px;
-            opacity: 0.9;
-        }
-
-        .search-section {
-            padding: 16px;
-            background: #f7fafc;
-            border-bottom: 1px solid #e2e8f0;
-        }
-
-        .search-box {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-        }
-
-        #customer-email {
-            flex: 1;
-            min-width: 180px;
-            padding: 10px 12px;
-            border: 2px solid #cbd5e0;
-            border-radius: 6px;
-            font-size: 14px;
+        .container {
             background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            max-width: 400px;
+            width: 100%;
+            text-align: center;
         }
 
-        #customer-email:focus {
-            outline: none;
-            border-color: #667eea;
+        h1 {
+            color: #2d3748;
+            margin-bottom: 10px;
+            font-size: 24px;
         }
 
-        .btn-primary {
-            padding: 10px 20px;
+        p {
+            color: #718096;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+
+        .info-box {
+            background: #f7fafc;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            text-align: left;
+        }
+
+        .info-label {
+            font-size: 11px;
+            color: #a0aec0;
+            text-transform: uppercase;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .info-value {
+            font-size: 14px;
+            color: #2d3748;
+            font-weight: 600;
+        }
+
+        button {
             background: #667eea;
             color: white;
             border: none;
+            padding: 12px 24px;
             border-radius: 6px;
             font-weight: 600;
             cursor: pointer;
             font-size: 14px;
-            white-space: nowrap;
-        }
-
-        .btn-primary:hover {
-            background: #5568d3;
-        }
-
-        .btn-primary:disabled {
-            background: #cbd5e0;
-            cursor: not-allowed;
-        }
-
-        .error-box {
+            width: 100%;
             margin-top: 10px;
-            padding: 10px;
-            background: #fed7d7;
-            border: 1px solid #fc8181;
-            border-radius: 6px;
-            color: #c53030;
-            font-size: 13px;
-        }
-
-        .spinner {
-            display: inline-block;
-            width: 14px;
-            height: 14px;
-            border: 2px solid rgba(255,255,255,0.3);
-            border-top-color: white;
-            border-radius: 50%;
-            animation: spin 0.6s linear infinite;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        .orders-container {
-            padding: 16px;
-            max-height: 500px;
-            overflow-y: auto;
-        }
-
-        .orders-header {
-            font-size: 16px;
-            font-weight: 700;
-            margin-bottom: 12px;
-            color: #2d3748;
-        }
-
-        .order-card {
-            background: white;
-            border: 2px solid #e2e8f0;
-            border-radius: 8px;
-            padding: 14px;
-            margin-bottom: 10px;
-            cursor: pointer;
             transition: all 0.2s;
         }
 
-        .order-card:hover {
-            border-color: #667eea;
-            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.15);
+        button:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
         }
 
-        .order-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: start;
+        .status {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-top: 15px;
+        }
+
+        .status-success {
+            background: #c6f6d5;
+            color: #22543d;
+        }
+
+        .counter {
+            font-size: 48px;
+            font-weight: 700;
+            color: #667eea;
+            margin: 20px 0;
+        }
+
+        .emoji {
+            font-size: 48px;
             margin-bottom: 10px;
-        }
-
-        .order-id {
-            font-weight: 700;
-            font-size: 15px;
-            color: #2d3748;
-        }
-
-        .order-date {
-            font-size: 12px;
-            color: #718096;
-            margin-top: 2px;
-        }
-
-        .status-badge {
-            padding: 4px 10px;
-            border-radius: 12px;
-            font-size: 11px;
-            font-weight: 700;
-            text-transform: uppercase;
-        }
-
-        .status-delivered { background: #c6f6d5; color: #22543d; }
-        .status-shipped { background: #bee3f8; color: #2c5282; }
-        .status-processing { background: #feebc8; color: #7c2d12; }
-
-        .order-footer {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding-top: 10px;
-            border-top: 1px solid #e2e8f0;
-        }
-
-        .order-total {
-            font-size: 16px;
-            font-weight: 700;
-            color: #48bb78;
-        }
-
-        .view-details-btn {
-            color: #667eea;
-            font-weight: 600;
-            font-size: 13px;
-        }
-
-        .order-details {
-            padding: 16px;
-            max-height: 500px;
-            overflow-y: auto;
-        }
-
-        .back-btn {
-            background: none;
-            border: none;
-            color: #667eea;
-            font-weight: 600;
-            cursor: pointer;
-            margin-bottom: 12px;
-            font-size: 14px;
-            padding: 6px 0;
-        }
-
-        .back-btn:hover {
-            text-decoration: underline;
-        }
-
-        .detail-section {
-            background: white;
-            border: 2px solid #e2e8f0;
-            border-radius: 8px;
-            overflow: hidden;
-            margin-bottom: 12px;
-        }
-
-        .detail-header {
-            background: #f7fafc;
-            padding: 12px;
-            border-bottom: 2px solid #e2e8f0;
-            font-weight: 700;
-            font-size: 14px;
-        }
-
-        .detail-content {
-            padding: 12px;
-        }
-
-        .item-row {
-            display: flex;
-            justify-content: space-between;
-            padding: 10px;
-            background: #f7fafc;
-            border-radius: 6px;
-            margin-bottom: 6px;
-            font-size: 13px;
-        }
-
-        .tracking-box {
-            background: #ebf8ff;
-            border: 2px solid #90cdf4;
-            padding: 10px;
-            border-radius: 6px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-top: 10px;
-            gap: 8px;
-        }
-
-        .tracking-number {
-            font-weight: 700;
-            color: #2c5282;
-            font-size: 13px;
-            word-break: break-all;
-        }
-
-        .copy-btn {
-            background: #4299e1;
-            color: white;
-            border: none;
-            padding: 6px 10px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 11px;
-            font-weight: 600;
-        }
-
-        .copy-btn:hover {
-            background: #3182ce;
-        }
-
-        .action-buttons {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 8px;
-            padding: 12px;
-        }
-
-        .action-btn {
-            padding: 10px;
-            border: none;
-            border-radius: 6px;
-            color: white;
-            font-weight: 600;
-            cursor: pointer;
-            font-size: 12px;
-        }
-
-        .action-btn:hover {
-            opacity: 0.9;
-        }
-
-        .btn-blue { background: #4299e1; }
-        .btn-green { background: #48bb78; }
-        .btn-yellow { background: #ed8936; }
-        .btn-red { background: #f56565; }
-
-        .empty-state {
-            text-align: center;
-            padding: 40px 20px;
-            color: #a0aec0;
-        }
-
-        .empty-icon {
-            width: 60px;
-            height: 60px;
-            margin: 0 auto 12px;
-            opacity: 0.3;
-            stroke: currentColor;
-            fill: none;
-        }
-
-        .hidden {
-            display: none !important;
-        }
-
-        .font-bold { font-weight: 700; }
-        .text-gray { color: #718096; }
-
-        .demo-notice {
-            background: #fef5e7;
-            border: 1px solid #f4d03f;
-            padding: 10px;
-            border-radius: 6px;
-            margin-top: 10px;
-            font-size: 12px;
-            color: #7c6d0f;
         }
     </style>
 </head>
 <body>
-    <div id="widget-container">
-        <div class="widget-header">
-            <div class="header-content">
-                <svg class="icon" viewBox="0 0 24 24">
-                    <rect x="3" y="3" width="18" height="18" rx="2"/>
-                    <path d="M3 9h18M9 21V9"/>
-                </svg>
-                <div>
-                    <h1>Customer Order Tracker</h1>
-                    <p>Search orders instantly</p>
-                </div>
-            </div>
+    <div class="container">
+        <div class="emoji">👋</div>
+        <h1>Hello from SalesIQ Widget!</h1>
+        <p>This is a simple working widget</p>
+
+        <div class="info-box">
+            <div class="info-label">Widget Status</div>
+            <div class="info-value">✅ Running Successfully</div>
         </div>
 
-        <div class="search-section">
-            <div class="search-box">
-                <input 
-                    type="email" 
-                    id="customer-email" 
-                    placeholder="Enter customer email..."
-                />
-                <button id="search-btn" class="btn-primary">
-                    <span id="search-text">Search Orders</span>
-                    <span id="loading-spinner" class="spinner hidden"></span>
-                </button>
-            </div>
-            <div id="error-message" class="error-box hidden"></div>
-            <div class="demo-notice">
-                <strong>Demo:</strong> Try john@example.com or sarah@example.com
-            </div>
+        <div class="info-box">
+            <div class="info-label">Current Time</div>
+            <div class="info-value" id="time">Loading...</div>
         </div>
 
-        <div id="orders-list" class="orders-container hidden">
-            <div class="orders-header" id="orders-count"></div>
-            <div id="orders-content"></div>
+        <div class="info-box">
+            <div class="info-label">Button Clicks</div>
+            <div class="counter" id="counter">0</div>
         </div>
 
-        <div id="order-details" class="order-details hidden"></div>
+        <button onclick="incrementCounter()">Click Me!</button>
+        <button onclick="showAlert()" style="background: #48bb78;">Show Alert</button>
 
-        <div id="empty-state" class="empty-state">
-            <svg class="empty-icon" viewBox="0 0 24 24">
-                <rect x="3" y="3" width="18" height="18" rx="2"/>
-                <path d="M3 9h18M9 21V9"/>
-            </svg>
-            <p>Enter customer email and search</p>
-        </div>
+        <div class="status status-success">Widget Loaded</div>
     </div>
 
     <script>
-        // Mock order database
-        const mockOrderDatabase = {
-            'john@example.com': [
-                {
-                    orderId: 'ORD-2024-001',
-                    status: 'delivered',
-                    total: 249.99,
-                    date: '2025-11-10',
-                    items: [
-                        { name: 'Wireless Headphones', qty: 1, price: 149.99 },
-                        { name: 'Phone Case', qty: 2, price: 50.00 }
-                    ],
-                    tracking: 'TRK1234567890',
-                    carrier: 'FedEx',
-                    estimatedDelivery: '2025-11-15',
-                    shippingAddress: '123 Main St, New York, NY 10001'
-                },
-                {
-                    orderId: 'ORD-2024-002',
-                    status: 'shipped',
-                    total: 89.99,
-                    date: '2025-11-12',
-                    items: [
-                        { name: 'USB Cable', qty: 3, price: 29.99 },
-                        { name: 'Screen Protector', qty: 2, price: 30.00 }
-                    ],
-                    tracking: 'TRK0987654321',
-                    carrier: 'UPS',
-                    estimatedDelivery: '2025-11-16',
-                    shippingAddress: '456 Oak Ave, Los Angeles, CA 90001'
-                }
-            ],
-            'sarah@example.com': [
-                {
-                    orderId: 'ORD-2024-003',
-                    status: 'processing',
-                    total: 499.99,
-                    date: '2025-11-13',
-                    items: [
-                        { name: 'Laptop Stand', qty: 1, price: 299.99 },
-                        { name: 'Wireless Mouse', qty: 1, price: 200.00 }
-                    ],
-                    tracking: null,
-                    carrier: null,
-                    estimatedDelivery: '2025-11-18',
-                    shippingAddress: '789 Pine Rd, Chicago, IL 60601'
-                }
-            ]
-        };
+        let count = 0;
 
-        let currentOrders = [];
-        let ZSIQ = null;
+        // Update time every second
+        function updateTime() {
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString();
+            document.getElementById('time').textContent = timeStr;
+        }
+        
+        updateTime();
+        setInterval(updateTime, 1000);
 
-        // Initialize
-        document.addEventListener('DOMContentLoaded', () => {
-            console.log('Widget initializing...');
+        // Counter function
+        function incrementCounter() {
+            count++;
+            document.getElementById('counter').textContent = count;
             
-            // Check if we're inside SalesIQ
-            if (window.parent && window.parent !== window) {
-                console.log('Running inside SalesIQ iframe');
-                // Try to access parent's SalesIQ object
-                try {
-                    ZSIQ = window.parent.$zoho?.salesiq || window.$zoho?.salesiq;
-                } catch (e) {
-                    console.log('Cannot access parent SalesIQ, using standalone mode');
-                }
-            }
-            
-            initializeWidget();
-            setupEventListeners();
-        });
-
-        function initializeWidget() {
-            // Try to get visitor email from SalesIQ
-            if (ZSIQ && ZSIQ.visitor) {
-                try {
-                    ZSIQ.visitor.info((data) => {
-                        if (data && data.email) {
-                            document.getElementById('customer-email').value = data.email;
-                            console.log('Auto-filled email:', data.email);
-                        }
-                    });
-                } catch (e) {
-                    console.log('Could not get visitor info:', e);
-                }
-            }
-            
-            // Check URL parameters for email
-            const urlParams = new URLSearchParams(window.location.search);
-            const emailParam = urlParams.get('email');
-            if (emailParam) {
-                document.getElementById('customer-email').value = emailParam;
+            if (count === 5) {
+                alert('🎉 You clicked 5 times!');
             }
         }
 
-        function setupEventListeners() {
-            const searchBtn = document.getElementById('search-btn');
-            const emailInput = document.getElementById('customer-email');
-
-            searchBtn.addEventListener('click', handleSearch);
-            emailInput.addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') handleSearch();
-            });
+        // Alert function
+        function showAlert() {
+            alert('👋 Hello from the widget!');
         }
 
-        async function handleSearch() {
-            const email = document.getElementById('customer-email').value.trim();
-            
-            if (!email) {
-                showError('Please enter a customer email');
-                return;
-            }
-
-            showLoading(true);
-            hideError();
-            hideAllSections();
-
-            try {
-                const orders = await fetchOrders(email);
-                
-                if (orders && orders.length > 0) {
-                    currentOrders = orders;
-                    displayOrders(orders);
-                } else {
-                    showError('No orders found. Try: john@example.com or sarah@example.com');
-                }
-            } catch (error) {
-                showError('Error: ' + error.message);
-            } finally {
-                showLoading(false);
-            }
-        }
-
-        async function fetchOrders(email) {
-            await new Promise(r => setTimeout(r, 800));
-            return mockOrderDatabase[email.toLowerCase()] || null;
-        }
-
-        function displayOrders(orders) {
-            const container = document.getElementById('orders-content');
-            const countEl = document.getElementById('orders-count');
-            
-            countEl.textContent = `Orders Found: ${orders.length}`;
-            container.innerHTML = '';
-            
-            orders.forEach(order => {
-                container.appendChild(createOrderCard(order));
-            });
-            
-            document.getElementById('orders-list').classList.remove('hidden');
-        }
-
-        function createOrderCard(order) {
-            const card = document.createElement('div');
-            card.className = 'order-card';
-            card.onclick = () => showOrderDetails(order);
-            
-            card.innerHTML = `
-                <div class="order-header">
-                    <div>
-                        <div class="order-id">${order.orderId}</div>
-                        <div class="order-date">${order.date}</div>
-                    </div>
-                    <span class="status-badge status-${order.status}">${order.status}</span>
-                </div>
-                <div class="order-footer">
-                    <div class="order-total">$${order.total.toFixed(2)}</div>
-                    <div class="view-details-btn">View Details →</div>
-                </div>
-            `;
-            
-            return card;
-        }
-
-        function showOrderDetails(order) {
-            hideAllSections();
-            
-            const container = document.getElementById('order-details');
-            container.innerHTML = `
-                <button class="back-btn" onclick="backToOrders()">← Back</button>
-                
-                <div class="detail-section">
-                    <div class="detail-header">
-                        ${order.orderId} - ${order.date}
-                    </div>
-                    <div class="detail-content">
-                        <span class="status-badge status-${order.status}">${order.status.toUpperCase()}</span>
-                    </div>
-                </div>
-
-                <div class="detail-section">
-                    <div class="detail-header">Order Items</div>
-                    <div class="detail-content">
-                        ${order.items.map(item => `
-                            <div class="item-row">
-                                <div>
-                                    <div class="font-bold">${item.name}</div>
-                                    <div class="text-gray">Qty: ${item.qty}</div>
-                                </div>
-                                <div class="font-bold">$${item.price.toFixed(2)}</div>
-                            </div>
-                        `).join('')}
-                        <div style="margin-top: 12px; padding-top: 12px; border-top: 2px solid #e2e8f0; display: flex; justify-content: space-between;">
-                            <span class="font-bold">Total:</span>
-                            <span class="order-total">$${order.total.toFixed(2)}</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="detail-section">
-                    <div class="detail-header">Shipping</div>
-                    <div class="detail-content">
-                        <div style="font-size: 13px; margin-bottom: 8px;">
-                            <div class="text-gray">Address</div>
-                            <div class="font-bold">${order.shippingAddress}</div>
-                        </div>
-                        ${order.tracking ? `
-                            <div class="tracking-box">
-                                <div style="flex: 1;">
-                                    <div class="text-gray" style="font-size: 11px;">Tracking</div>
-                                    <div class="tracking-number">${order.tracking}</div>
-                                    <div class="text-gray" style="font-size: 11px; margin-top: 4px;">${order.carrier}</div>
-                                </div>
-                                <button class="copy-btn" onclick="copyTracking('${order.tracking}')">Copy</button>
-                            </div>
-                        ` : '<div style="background: #fef5e7; padding: 10px; border-radius: 6px; font-size: 12px; color: #d68910; margin-top: 8px;">Tracking not available yet</div>'}
-                        <div style="margin-top: 8px; font-size: 13px;">
-                            <div class="text-gray">Est. Delivery</div>
-                            <div class="font-bold">${order.estimatedDelivery}</div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="detail-section">
-                    <div class="detail-header">Actions</div>
-                    <div class="action-buttons">
-                        <button class="action-btn btn-blue" onclick="sendTracking('${order.tracking || ''}', '${order.orderId}')">Send Tracking</button>
-                        <button class="action-btn btn-green" onclick="updateStatus('${order.orderId}')">Update Status</button>
-                        <button class="action-btn btn-yellow" onclick="requestReturn('${order.orderId}')">Return</button>
-                        <button class="action-btn btn-red" onclick="processRefund('${order.orderId}')">Refund</button>
-                    </div>
-                </div>
-            `;
-            
-            container.classList.remove('hidden');
-        }
-
-        function copyTracking(tracking) {
-            if (tracking) {
-                navigator.clipboard.writeText(tracking).then(() => {
-                    alert('✅ Copied: ' + tracking);
-                }).catch(() => alert('Tracking: ' + tracking));
-            } else {
-                alert('⚠️ No tracking available');
-            }
-        }
-
-        function sendTracking(tracking, orderId) {
-            if (tracking) {
-                const msg = `Tracking for ${orderId}: ${tracking}`;
-                if (ZSIQ && ZSIQ.chat && ZSIQ.chat.send) {
-                    try {
-                        ZSIQ.chat.send(msg);
-                        alert('✅ Sent to customer');
-                    } catch (e) {
-                        alert('Demo: ' + msg);
-                    }
-                } else {
-                    alert('Demo: ' + msg);
-                }
-            } else {
-                alert('⚠️ No tracking available');
-            }
-        }
-
-        function updateStatus(orderId) {
-            const status = prompt('New status:', 'shipped');
-            if (status) alert(`✅ Updated ${orderId} to: ${status}`);
-        }
-
-        function requestReturn(orderId) {
-            if (confirm(`Create return for ${orderId}?`)) {
-                alert(`✅ Return created: RET-${Date.now()}`);
-            }
-        }
-
-        function processRefund(orderId) {
-            const amt = prompt('Refund amount:', '0.00');
-            if (amt && parseFloat(amt) > 0) {
-                if (confirm(`Refund $${amt} for ${orderId}?`)) {
-                    alert(`✅ Refund processed: $${amt}`);
-                }
-            }
-        }
-
-        function showLoading(show) {
-            const btn = document.getElementById('search-btn');
-            const spinner = document.getElementById('loading-spinner');
-            const text = document.getElementById('search-text');
-            
-            btn.disabled = show;
-            spinner.classList.toggle('hidden', !show);
-            text.textContent = show ? 'Searching...' : 'Search Orders';
-        }
-
-        function showError(msg) {
-            const box = document.getElementById('error-message');
-            box.textContent = msg;
-            box.classList.remove('hidden');
-        }
-
-        function hideError() {
-            document.getElementById('error-message').classList.add('hidden');
-        }
-
-        function hideAllSections() {
-            document.getElementById('orders-list').classList.add('hidden');
-            document.getElementById('order-details').classList.add('hidden');
-            document.getElementById('empty-state').classList.add('hidden');
-        }
-
-        function backToOrders() {
-            document.getElementById('order-details').classList.add('hidden');
-            document.getElementById('orders-list').classList.remove('hidden');
+        // Log when widget loads
+        console.log('SalesIQ Widget loaded successfully!');
+        
+        // Try to detect if running in SalesIQ
+        if (window.parent !== window) {
+            console.log('Running inside iframe (probably SalesIQ)');
         }
     </script>
 </body>
